@@ -4,7 +4,7 @@
 }
 
 
-@font-face {
+@font-face {                                         /*  Скопировано */
     font-family: MainFontBold;
     src: url("../fonts/OpenSans_Condensed-Bold.ttf");
 }
@@ -39,7 +39,7 @@ z-index: 1000;
     z-index: 1000;
 }
 
-.Background
+.Background               /*  Скопировано */
 {
     background-repeat: repeat;
     background-image: url("http://localhost:9000/dungeonsanddragonsphotos/bgdark.png");
@@ -54,7 +54,7 @@ padding:0px;
 position:absolute;
 }
 
-.AccountIcon
+/* .AccountIcon
 {
 color:#ECE4D9;
 height:92px;
@@ -65,7 +65,7 @@ outline:none;
 right: 66px;
 top:14px;
 position:absolute;
-}
+} */
 
 .cartIcon
 {
@@ -168,7 +168,7 @@ position:absolute;
 .searchBar
 {
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-background-color:#ECE4D9;
+background-color:#ECE4D9; 
 height:90px;
 width:1150px;
 border-radius:22px;
@@ -202,7 +202,7 @@ position:absolute;
     position:absolute;
 }
 
-.characterCard
+.characterCard            /*  Скопировано */
 {
     background-image: radial-gradient(500px at 0 0, rgba(23, 117, 183, 0.4), transparent),
     radial-gradient(0px at 100% 100%, rgba(23, 117, 183, 0.4), transparent);

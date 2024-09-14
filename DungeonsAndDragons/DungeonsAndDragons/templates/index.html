@@ -4,7 +4,7 @@
 {% block content %}
 <div class="searchBar">
     <form method="get" action="{%url 'index' %}">
-        <input type="text" class="searchInput" name="q" placeholder="Поиск...">
+        <input type="text" class="searchInput" name="search" placeholder="Поиск...">
         <button type="submit" class="searchIcon">
             <img src="{% static 'image/searchIcon.svg' %}" alt="Search Icon">
         </button>
@@ -36,13 +36,15 @@
 </div>
 
 <div class="BackCartIcon">
-    <a href="/requests/"><div class="cartIcon">
-        <img src="{% static 'image/CartIcon.svg' %}" alt="Cart Icon">
-        <div class="cartIconCircle">
-            <div class="cartIconNumber">{{ count_characters }}</div>
+    <a href="{% url 'request' request_id %}">
+        <div class="cartIcon">
+            <img src="{% static 'image/CartIcon.svg' %}" alt="Cart Icon">
+            <div class="cartIconCircle">
+                <div class="cartIconNumber">{{ count_characters }}</div>
             
-        </div>
-    </div>
+            </div>
+        </div>      
+        
     </a>
 </div>
 {% endblock %}

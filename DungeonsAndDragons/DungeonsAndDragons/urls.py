@@ -21,6 +21,6 @@ from DungeonsAndDragons import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('detail/<int:id>', views.detail, name='detail'),
-    path('requests/', views.request, name='request')
+    path('detail/<int:id>/', views.detail, name='detail'),
+    path('requests/<int:id>/', views.request, name='request')
 ]

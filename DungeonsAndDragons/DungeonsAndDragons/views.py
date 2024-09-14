@@ -93,14 +93,14 @@ def count_characters(request_id):
 
 
 def index(request):
-    query = request.GET.get('q')
+    query = request.GET.get('search')
     if query:
         filtered_characters = [char for char in characters if query.lower() in char['name'].lower()]
     else:
         filtered_characters = characters
-    request_id = 2 
+    request_id = 1
     count = count_characters(request_id)
-    return render(request, 'index.html', {'characters': filtered_characters, 'count_characters': count})
+    return render(request, 'index.html', {'characters': filtered_characters, 'count_characters': count, 'request_id': request_id})
     
 
 def base(request):
@@ -114,11 +114,10 @@ def detail(request, id):
             break  
     return render(request, 'detail.html', {'character': character})
 
-def request(request):
-    request_id = 2
+def request(request, id):
     characters_in_request = []
     for req in requests:
-        if req['id'] == request_id:
+        if req['id'] == id:
             for char_id in req['items']:
                 for char in characters:
                     if char['id'] == char_id:
