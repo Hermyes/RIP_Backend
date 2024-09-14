@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<h2 class="RequestedNPCs">Ваши NPC:</h2>
+<div class="RequestedCharactersCards">
+    {% for character in characters %}
+        <div class="RequestedCharacterCard">
+            <hr class="RequestedCharacterLine">
+            <h2 class="RequestedCharacterName">{{ character.name }}</h2>
+            <p class="RequestedCharacterRace">{{ character.race}}</p>
+
+            <p class="RequestedCharacterCoordinatesHeader">Координаты персонажа:</p>
+            <p class="RequestedCharacterCoordinatesXY">X:          Y:</p>
+            <div class="RequestedCharacterX">
+                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="X">
+                <!-- Когда нибудь здесь будет реализация ввода координаты Х -->
+            </div>
+            
+            <div class="RequestedCharacterY">
+                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="Y">
+                <!-- Когда нибудь здесь будет реализация ввода координаты Y -->
+            </div>
+
+
+            <div class="RequestedCharacterFriendCard">
+                <p class="RequestedCharacterFriend">Д</p>
+            </div>
+
+            <div class="RequestedCharacterEnemyCard">
+                <p class="RequestedCharacterEnemy">В</p>
+            </div>
+
+            <div class="RequestedCharacterPhoto">
+                <img src="{{ character.photo_url }}" alt="Character Photo" class="characterImage" style="width: 300px; height: 242px;">
+            </div>
+
+
+            
+
+
+
+
+        <!-- <div class="RequestedCharacterParameters">
+            <h2 class="RequestedCharacterStrengthHeader">Сил</h2>
+            <p class="RequestedCharacterStrengthValue">{{ character.strength }}</p>
+            <h2 class="RequestedCharacterDexterityHeader">Лов</h2>
+            <p class="RequestedCharacterDexterityValue">{{ character.dexterity }}</p>
+            <h2 class="RequestedCharacterConstitutionHeader">Тел</h2>
+            <p class="RequestedCharacterConstitutionValue">{{ character.constitution }}</p>
+            <h2 class="RequestedCharacterIntelligenceHeader">Инт</h2>
+            <p class="RequestedCharacterIntelligenceValue">{{ character.intelligence }}</p>
+            <h2 class="RequestedCharacterWisdomHeader">Мдр</h2>
+            <p class="RequestedCharacterWisdomValue">{{ character.wisdom }}</p>
+            <h2 class="RequestedCharacterCharismaHeader">Хар</h2>
+            <p class="RequestedCharacterCharismaValue">{{ character.charisma }}</p>
+        </div> -->
+        </div>
+    {% endfor %}
+
+
+    <div class="RequestLocationNameCard">
+        <input type="text" class="RequestLocationName" maxlength="20" placeholder="Название локации">
+    </div>
+
+    <div class="RequestLocationImage">
+        <img src="http://localhost:9000/dungeonsanddragonsphotos/ForestCamp.jpg" alt="Location Image" class="locationImage" style="width: 554px; height: 395px; border-radius: 30px;">
+    </div>
+
+    <button class="RequestLocationAddButton">
+        <p class="RequestLocationAddHeader">Добавить в локацию</p>
+    </button>
+
+</div>
+{% endblock %}

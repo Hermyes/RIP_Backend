@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Website Title</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="UpperBar">
+        <!-- <div class="AccountIcon">
+            <img src="{% static 'image/AccountIcon.svg' %}" alt="Account Icon">
+        </div> -->
+        
+        
+        
+        <a href="/"><div class="charactersIcon">
+        <img src="{% static 'image/charactersIcon.svg' %}" alt="Characters Icon">
+        </div>
+        </a>
+    </div>
+
+    
+    
+    <div class="Background">
+        
+    </div>
+    
+    
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <!-- <div class="BottomMenu">
+        <div>
+            Асланова Анастасия
+        </div>
+    </div> -->
+</body>
+</html>

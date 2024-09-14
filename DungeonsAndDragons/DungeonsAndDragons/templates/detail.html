@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="DetailPhotoCard">
+    <div class="DetailPhotoCardCharacterPhoto">
+        <img src="{{ character.photo_url }}" alt="Character Photo" class="characterImage" style="width: 360px; height: 486px;">
+    </div>
+        <hr class="DetailPhotoCardLine">
+        <h2 class="DetailPhotoCardCharacterName">{{ character.name }}</h2>
+</div>
+<div class="DetailCharacterParameters">
+    <h2 class="DetailCharacterParametersStrengthHeader">Сил</h2>
+    <p class="DetailCharacterParametersStrengthValue">{{ character.strength }}</p>
+    <h2 class="DetailCharacterParametersDexterityHeader">Лов</h2>
+    <p class="DetailCharacterParametersDexterityValue">{{ character.dexterity }}</p>
+    <h2 class="DetailCharacterParametersConstitutionHeader">Тел</h2>
+    <p class="DetailCharacterParametersConstitutionValue">{{ character.constitution }}</p>
+    <h2 class="DetailCharacterParametersIntelligenceHeader">Инт</h2>
+    <p class="DetailCharacterParametersIntelligenceValue">{{ character.intelligence }}</p>
+    <h2 class="DetailCharacterParametersWisdomHeader">Мдр</h2>
+    <p class="DetailCharacterParametersWisdomValue">{{ character.wisdom }}</p>
+    <h2 class="DetailCharacterParametersCharismaHeader">Хар</h2>
+    <p class="DetailCharacterParametersCharismaValue">{{ character.charisma }}</p>
+</div>
+<div class="DetailCharacterRaceAndClassCard">
+    <h2 class="DetailCharacterRaceAndClassCardRaceAndClassHeader">Класс:
+        Раса:</h2>
+    <p class="DetailCharacterRaceAndClassCardClassValue">{{ character.class}}</p>
+    <p class="DetailCharacterRaceAndClassCardRaceValue">{{ character.race }}</p>
+</div>
+<div class="DetailCharacterArmorClassCard">
+    <div class="DetailCharacterArmorClassCardArmorClassIcon">
+        <img src="{% static 'image/shieldIcon.svg' %}" alt="Shield Icon" class="shieldIcon">
+    </div>
+    <p class="DetailCharacterArmorClassValue">{{ character.armor_class }}</p>
+</div>
+
+<div class="DetailCharacterHitPointsCard">
+    <div class="DetailCharacterHitPointsCardHitPointsIcon">
+        <img src="{% static 'image/heartIcon.svg' %}" alt="Heart Icon" class="heartIcon">
+    </div>
+    <p class="DetailCharacterHitPointsValue">{{ character.hit_points }}</p>
+</div>
+
+<div class="DetailCharacterDescriptionCard">
+    <div class="DetailCharacterDescriptionCardIn">
+        <p class="DetailCharacterDescription">{{ character.description }}</p>
+    </div>
+
+    <p class="DetailCharacterSpecialEquipmentHeader">Особое сняряжение:</p>
+    <p class="DetailCharacterSpecialEquipmentValue">{{ character.special_equipment }}</p>
+    
+    <p class="DetailCharacterSkillsHeader">Навыки:</p>
+    <p class="DetailCharacterSkillsValue">{{ character.skills }}</p>
+</div>
+{%endblock%}

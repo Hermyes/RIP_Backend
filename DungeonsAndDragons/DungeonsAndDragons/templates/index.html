@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="searchBar">
+    <form method="get" action="{%url 'index' %}">
+        <input type="text" class="searchInput" name="q" placeholder="Поиск...">
+        <button type="submit" class="searchIcon">
+            <img src="{% static 'image/searchIcon.svg' %}" alt="Search Icon">
+        </button>
+    </form>
+</div>
+
+
+
+
+<div class="CharactersCards">
+    {% for character in characters %}
+    <a href = "{%url 'detail' character.id%}">
+        <div class="characterCard">
+            <div class="characterPhoto">
+                <img src="{{ character.photo_url }}" alt="Character Photo" class="characterImage" style="width: 372px; height: 553px;">
+            </div>
+            <div class="characterDescriptionCard">
+                <hr class="lineCharacter">
+                <h2 class="CharacterNameOnCard">{{ character.name }}</h2>
+                <p class="CharacterRaceOnCard">{{ character.race }}</p>
+            </div>
+            <div class="characterDescriptionCardLow">
+                <p class="CharacterFeaturesOnCardHeader">Особенности:</p>
+                <p class="CharacterFeaturesOnCard">{{ character.features }}</p>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="BackCartIcon">
+    <a href="/requests/"><div class="cartIcon">
+        <img src="{% static 'image/CartIcon.svg' %}" alt="Cart Icon">
+        <div class="cartIconCircle">
+            <div class="cartIconNumber">{{ count_characters }}</div>
+            
+        </div>
+    </div>
+    </a>
+</div>
+{% endblock %}
