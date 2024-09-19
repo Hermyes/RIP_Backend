@@ -68,15 +68,27 @@ characters = [
 requests = [
     {
         'id': 1,
-        'items': [1, 2, 3]
+        'items': [
+            {'id': 1, 'coordinates': {'x': 10, 'y': 20}},
+            {'id': 2, 'coordinates': {'x': 15, 'y': 25}},
+            {'id': 3, 'coordinates': {'x': 20, 'y': 30}}
+        ],
+        'map_name': 'Подземелье Черного Лабиринта',
     },
     {
         'id': 2,
-        'items': [1, 3]
+        'items': [
+            {'id': 1, 'coordinates': {'x': 5, 'y': 10}},
+            {'id': 3, 'coordinates': {'x': 10, 'y': 15}}
+        ],
+        'map_name': 'Подземелье Черного',
     },
     {
         'id': 3,
-        'items': [2]
+        'items': [
+            {'id': 2, 'coordinates': {'x': 0, 'y': 5}}
+        ],
+        'map_name': 'Высокогорье Халдара',
     }
 ]
 
@@ -84,16 +96,16 @@ def count_characters(request_id):
     characters_in_request = []
     for req in requests:
         if req['id'] == request_id:
-            for char_id in req['items']:
+            for item in req['items']:
                 for char in characters:
-                    if char['id'] == char_id:
+                    if char['id'] == item['id']:
                         characters_in_request.append(char)
             break
     return len(characters_in_request)
 
 
-def index(request):
-    query = request.GET.get('search')
+def Characters(request):
+    query = request.GET.get('CharacterSearch')
     if query:
         filtered_characters = [char for char in characters if query.lower() in char['name'].lower()]
     else:
@@ -106,7 +118,7 @@ def index(request):
 def base(request):
     return render(request, 'base.html')
 
-def detail(request, id):
+def characterDetails(request, id):
     character = None
     for char in characters:
         if char['id'] == id:
@@ -114,16 +126,19 @@ def detail(request, id):
             break  
     return render(request, 'detail.html', {'character': character})
 
-def request(request, id):
+def charactersOnMap(request, id):
     characters_in_request = []
+    map_name = ""
+    coordinates = []
     for req in requests:
         if req['id'] == id:
-            for char_id in req['items']:
+            map_name = req['map_name']
+            for item in req['items']:
                 for char in characters:
-                    if char['id'] == char_id:
-                        characters_in_request.append(char)
+                    if char['id'] == item['id']:
+                        char_with_coordinates = char.copy()
+                        char_with_coordinates['coordinates'] = item['coordinates']
+                        characters_in_request.append(char_with_coordinates)
+                        coordinates.append({'coordinate_x': item['coordinates']['x'], 'coordinate_y': item['coordinates']['y']})
             break
-    return render(request, 'request.html', {'characters': characters_in_request})
-
-
-
+    return render(request, 'request.html', {'characters': characters_in_request, 'map_name': map_name, 'coordinates': coordinates})

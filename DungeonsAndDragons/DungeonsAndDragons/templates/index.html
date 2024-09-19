@@ -3,8 +3,8 @@
 
 {% block content %}
 <div class="searchBar">
-    <form method="get" action="{%url 'index' %}">
-        <input type="text" class="searchInput" name="search" placeholder="Поиск...">
+    <form method="get" action="{%url 'Characters' %}">
+        <input type="text" class="searchInput" name="CharacterSearch" placeholder="Поиск...">
         <button type="submit" class="searchIcon">
             <img src="{% static 'image/searchIcon.svg' %}" alt="Search Icon">
         </button>
@@ -16,7 +16,7 @@
 
 <div class="CharactersCards">
     {% for character in characters %}
-    <a href = "{%url 'detail' character.id%}">
+    <a href = "{%url 'characterDetails' character.id%}">
         <div class="characterCard">
             <div class="characterPhoto">
                 <img src="{{ character.photo_url }}" alt="Character Photo" class="characterImage" style="width: 372px; height: 553px;">
@@ -36,7 +36,7 @@
 </div>
 
 <div class="BackCartIcon">
-    <a href="{% url 'request' request_id %}">
+    <a href="{% url 'charactersOnMap' request_id %}">
         <div class="cartIcon">
             <img src="{% static 'image/CartIcon.svg' %}" alt="Cart Icon">
             <div class="cartIconCircle">

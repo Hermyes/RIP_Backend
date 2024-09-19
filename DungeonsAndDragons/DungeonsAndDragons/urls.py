@@ -20,7 +20,7 @@ from DungeonsAndDragons import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
-    path('detail/<int:id>/', views.detail, name='detail'),
-    path('requests/<int:id>/', views.request, name='request')
+    path('', views.Characters, name='Characters'),
+    path('characterDetails/<int:id>/', views.characterDetails, name='characterDetails'),
+    path('charactersOnMap/<int:id>/', views.charactersOnMap, name='charactersOnMap')
 ]

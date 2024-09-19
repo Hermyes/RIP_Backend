@@ -13,12 +13,12 @@
             <p class="RequestedCharacterCoordinatesHeader">Координаты персонажа:</p>
             <p class="RequestedCharacterCoordinatesXY">X:          Y:</p>
             <div class="RequestedCharacterX">
-                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="X">
+                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="X" value="{{character.coordinates.x}}">
                 <!-- Когда нибудь здесь будет реализация ввода координаты Х -->
             </div>
             
             <div class="RequestedCharacterY">
-                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="Y">
+                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="Y" value="{{character.coordinates.y}}">
                 <!-- Когда нибудь здесь будет реализация ввода координаты Y -->
             </div>
 
@@ -60,7 +60,7 @@
 
 
     <div class="RequestLocationNameCard">
-        <input type="text" class="RequestLocationName" maxlength="20" placeholder="Название локации">
+        <input type="text" class="RequestLocationName" maxlength="20" placeholder="Название локации" value="{{map_name}}">
     </div>
 
     <div class="RequestLocationImage">
