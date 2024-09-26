@@ -13,12 +13,12 @@
             <p class="RequestedCharacterCoordinatesHeader">Координаты персонажа:</p>
             <p class="RequestedCharacterCoordinatesXY">X:          Y:</p>
             <div class="RequestedCharacterX">
-                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="X" value="{{character.coordinates.x}}">
+                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="X" value="">
                 <!-- Когда нибудь здесь будет реализация ввода координаты Х -->
             </div>
             
             <div class="RequestedCharacterY">
-                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="Y" value="{{character.coordinates.y}}">
+                <input type="text" class="RequestedCharacterCoordinatesXYValue" maxlength="2" placeholder="Y" value="">
                 <!-- Когда нибудь здесь будет реализация ввода координаты Y -->
             </div>
 
@@ -70,6 +70,13 @@
     <button class="RequestLocationAddButton">
         <p class="RequestLocationAddHeader">Добавить в локацию</p>
     </button>
+
+    <form action="{% url 'deleteRequest' current_request_id %}" method="post">
+        {% csrf_token %}
+        <button class="RequestLocationDeleteButton">
+            <p class="RequestLocationAddHeader">Удалить заявку</p>
+        </button>
+    </form>
 
 </div>
 {% endblock %}

@@ -16,8 +16,9 @@
 
 <div class="CharactersCards">
     {% for character in characters %}
-    <a href = "{%url 'characterDetails' character.id%}">
+    
         <div class="characterCard">
+            <a href = "{%url 'characterDetails' character.character_id%}">
             <div class="characterPhoto">
                 <img src="{{ character.photo_url }}" alt="Character Photo" class="characterImage" style="width: 372px; height: 553px;">
             </div>
@@ -30,8 +31,18 @@
                 <p class="CharacterFeaturesOnCardHeader">Особенности:</p>
                 <p class="CharacterFeaturesOnCard">{{ character.features }}</p>
             </div>
+            </a>
+            <form method="post" action="{% url 'addCharacter' character.character_id %}">
+                {% csrf_token %}
+                <button type="submit" class="addButton">
+                    <div class="addIcon">
+                        <img src="{% static 'image/plusIcon.svg' %}" alt="Add Icon">
+                    </div>
+                </button>
+            </form>
+
         </div>
-    </a>
+    
     {% endfor %}
 </div>
 

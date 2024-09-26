@@ -1,144 +1,76 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from datetime import date
+from .models import Character, Request, CharacterToRequest
+from django.db import connection
 
-characters = [
-    {
-        'id': 1,
-        'name': 'Боско Даггерхэнд',
-        'race': 'Человек',
-        'class': 'Следопыт', 
-        'description': 'Боско Даггерхэнд зовётся так, потому что он никогда не пожимает руку, если его другая рука не лежит угрожающе на рукояти кинжал в ножнах. Он держит полудикого дейнониха в качестве сторожевого животного, которым он управляет своим волшебным кольцом. Пираты кличут хищника Костяшкой, потому что у того, кто достаточно глуп, чтобы дать ему укусить руку, больше ничего не останется.',
-        # 'short_description': 'Боско Даггерхэнд никогда не пожимает руку без кинжала наготове. Его сторожевой зверь — дейноних Костяшка, которого он контролирует волшебным кольцом, известен тем, что после него не остаётся костей.',
-        'features': 'Кольцо влияния на животных, тактика стаи',
-        'special_equipment': 'Кольцо влияния на животных',
-        'skills': 'Тактика стаи',
-        'hit_points': 32,
-        'armor_class': 11,
-        'strength': '15(+2)', 
-        'dexterity': '11(+0)',
-        'constitution': '14(+2)',
-        'intelligence': '10(+0)',
-        'wisdom': '10(+0)',
-        'charisma': '11(+0)',
-        'photo_url': 'http://localhost:9000/dungeonsanddragonsphotos/Brosco_Daggerhand.png' 
-    },
-    {
-        'id': 2,
-        'name': 'Бастиан Термандар',
-        'race': 'Огненный дженази',
-        'class': 'Заклинатель',  
-        'description': 'Подобно многим в культе огня, Бастиан горит вну­тренним огнём, но его пламя питает скорее често­любие, а не желание увидеть выжженный дочиста мир. Бастиан замышляет свергнуть Вейнифер и присвоить Высекающий Искры себе. Бастиан практикует тайные искусства, причем многое о своей магии огня он узнал от самой Вей­нифер. В бою он полагается на свои заклинания: его прозвали «быстрый ожог», так как обычно он пытается нанести максимальный урон в начале схватки. Если Бастиан знает, что грядёт бой, но не может нанести упреждающий удар, он становит­ся более осторожным, вызывая стену огня, чтобы защитить себя, прежде чем использовать другие боевые заклинания.',
-        # 'short_description': 'Бастиан Термандар — огненный дженази, который питает своё честолюбие внутренним огнём. Он стремится свергнуть Вейнифер и присвоить себе Высекающий Искры. Бастиан практикует тайные искусства, многое из которых он узнал от самой Вейнифер.',
-        'features': 'Заклинатель 9 уровня',
-        'special_equipment': 'Отсутствует',
-        'skills': 'Заклинания до 5 уровня',
-        'hit_points': 78,
-        'armor_class': 15,
-        'strength': '10(+0)',
-        'dexterity': '14(+2)',
-        'constitution': '16(+3)',
-        'intelligence': '12(+1)',
-        'wisdom': '10(+0)',
-        'charisma': '18(+3)',
-        'photo_url': 'http://localhost:9000/dungeonsanddragonsphotos/BastianTarmandr.png'
-    },
-    {
-        'id': 3,
-        'name': 'Дрэгонбэйт',
-        'race': 'Сауриал',
-        'class': 'Паладин', 
-        'description': 'Дрэгонбэйт является чемпионом добра из расы сауриал, которая возникла на далёком мире, и представители которого имеют долгую жизнь. В Забытых Королевствах проживает очень мало сауриалов, и, как полагают, не существует никаких сельских сообществ в любой точке мира. Дрэгонбэйт ростом 4 фута 10 дюймов, весит 150 фунтов и имеет сухую морщинистую шкуру. Он владеет длинным мечом «Святой мститель» и носит сине-красно-белый щит. Хотя у него есть общие особенности с паладинами, Дрэгонбэйт не является членом какого-либо класса. Используя способность, известную как Шен-стейт, он может определить мировоззрение любого существа в пределах 60 футов от него.',
-        # 'short_description': 'Дрэгонбэйт — чемпион добра из расы сауриал. Владеет длинным мечом «Святой мститель» и носит сине-красно-белый щит. Использует способность Шен-стейт для определения мировоззрения существ в радиусе 60 футов.',
-        'features': 'Божественное здоровье, Аура сопротивления магии',
-        'special_equipment': 'Длинный меч «Святой мститель», сине-красно-белый щит',
-        'skills': 'Чувство мировоззрения',
-        'hit_points': 120,
-        'armor_class': 18,
-        'strength': '18(+4)',
-        'dexterity': '12(+1)',
-        'constitution': '16(+3)',
-        'intelligence': '10(+0)',
-        'wisdom': '14(+2)',
-        'charisma': '16(+3)',
-        'photo_url': 'http://localhost:9000/dungeonsanddragonsphotos/DragonBait.png'
-     } 
-]
+user_id=1
 
-requests = [
-    {
-        'id': 1,
-        'items': [
-            {'id': 1, 'coordinates': {'x': 10, 'y': 20}},
-            {'id': 2, 'coordinates': {'x': 15, 'y': 25}},
-            {'id': 3, 'coordinates': {'x': 20, 'y': 30}}
-        ],
-        'map_name': 'Подземелье Черного Лабиринта',
-    },
-    {
-        'id': 2,
-        'items': [
-            {'id': 1, 'coordinates': {'x': 5, 'y': 10}},
-            {'id': 3, 'coordinates': {'x': 10, 'y': 15}}
-        ],
-        'map_name': 'Подземелье Черного',
-    },
-    {
-        'id': 3,
-        'items': [
-            {'id': 2, 'coordinates': {'x': 0, 'y': 5}}
-        ],
-        'map_name': 'Высокогорье Халдара',
-    }
-]
+def get_active_request_for_user(user_id):
+    request = Request.objects.filter(creator_id=user_id, status='draft').first()
+    if request is None:
+        request = Request.objects.create(creator_id=user_id, status='draft')
+    return request
 
 def count_characters(request_id):
-    characters_in_request = []
-    for req in requests:
-        if req['id'] == request_id:
-            for item in req['items']:
-                for char in characters:
-                    if char['id'] == item['id']:
-                        characters_in_request.append(char)
-            break
-    return len(characters_in_request)
-
+    req = CharacterToRequest.objects.filter(request_id=request_id).count()
+    if req:
+        return req
+    return 0
 
 def Characters(request):
     query = request.GET.get('CharacterSearch')
     if query:
-        filtered_characters = [char for char in characters if query.lower() in char['name'].lower()]
+        filtered_characters = Character.objects.filter(name__icontains=query)
     else:
-        filtered_characters = characters
-    request_id = 1
+        filtered_characters = Character.objects.all()
+    request_id = get_active_request_for_user(user_id).request_id
     count = count_characters(request_id)
     return render(request, 'index.html', {'characters': filtered_characters, 'count_characters': count, 'request_id': request_id})
-    
 
 def base(request):
     return render(request, 'base.html')
 
 def characterDetails(request, id):
-    character = None
-    for char in characters:
-        if char['id'] == id:
-            character = char
-            break  
+    character = Character.objects.filter(character_id=id).first()
     return render(request, 'detail.html', {'character': character})
 
 def charactersOnMap(request, id):
+    req = Request.objects.filter(request_id=id)
     characters_in_request = []
-    map_name = ""
     coordinates = []
-    for req in requests:
-        if req['id'] == id:
-            map_name = req['map_name']
-            for item in req['items']:
-                for char in characters:
-                    if char['id'] == item['id']:
-                        char_with_coordinates = char.copy()
-                        char_with_coordinates['coordinates'] = item['coordinates']
-                        characters_in_request.append(char_with_coordinates)
-                        coordinates.append({'coordinate_x': item['coordinates']['x'], 'coordinate_y': item['coordinates']['y']})
-            break
-    return render(request, 'request.html', {'characters': characters_in_request, 'map_name': map_name, 'coordinates': coordinates})
+    if req:
+        req2=CharacterToRequest.objects.filter(request_id=id)
+        for item in req2.all():
+            char = item.character
+            char_with_coordinates = {
+                'id': char.character_id,
+                'name': char.name,
+                'photo_url': char.photo_url,
+                'coordinates': {'x': item.coordinate_x, 'y': item.coordinate_y},
+            }
+            characters_in_request.append(char_with_coordinates)
+            coordinates.append({'coordinate_x': item.coordinate_x, 'coordinate_y': item.coordinate_y})
+        map_name = req.first().map_name
+    else:
+        map_name = ""
+    return render(request, 'request.html', {'characters': characters_in_request, 'map_name': map_name, 'coordinates': coordinates, 'current_request_id': id})
+
+
+
+
+
+def add_character_to_request_for_user(user_id, character_id):
+    request = get_active_request_for_user(user_id)
+    CharacterToRequest.objects.get_or_create(request=request, character_id=character_id)
+
+
+def add_character(request, character_id):
+    add_character_to_request_for_user(user_id, character_id)
+    return Characters(request)
+
+
+def delete_request(request, request_id):
+    with connection.cursor() as cursor:
+        cursor.execute("UPDATE request SET status = 'Удалён' WHERE request_id = %s", [request_id])
+    return Characters(request)

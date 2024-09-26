@@ -22,5 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.Characters, name='Characters'),
     path('characterDetails/<int:id>/', views.characterDetails, name='characterDetails'),
-    path('charactersOnMap/<int:id>/', views.charactersOnMap, name='charactersOnMap')
+    path('charactersOnMap/<int:id>/', views.charactersOnMap, name='charactersOnMap'),
+    path('addCharacter/<int:character_id>/', views.add_character, name='addCharacter'),
+    path('deleteRequest/<int:request_id>/', views.delete_request, name='deleteRequest')
 ]

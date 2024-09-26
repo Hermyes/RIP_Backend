@@ -145,19 +145,20 @@ position:absolute;
 
 .searchInput
 {
-    border: none;
-    border-style: hidden;
-
-    /* border-color: #ECE4D9; */
-    font-family: MainFont;
+    background-color:transparent;
+    text-align: left;
+    vertical-align: middle;
     font-size: 40px;
-background-color:transparent;
+    font-family: MainFont;
+    border-style: hidden;
+    outline: none;
 height:50px;
 width:1000px;
 top:15px;
 left:20px;
 position:absolute;
 }
+
 
 .searchInput:active
 {
@@ -167,6 +168,7 @@ position:absolute;
 
 .searchBar
 {
+    border-color: transparent;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 background-color:#ECE4D9; 
 height:90px;
@@ -211,8 +213,16 @@ position:absolute;
     width:550px;
     filter:drop-shadow(8px 4px 6.599999904632568px rgba(0,0,0,0.25));
     border-radius:30px;
-
+    transition: transform 0.2s;
+    perspective: 1000px;
 }
+
+.characterCard:hover {
+    transform: scale(0.98);
+    transition: transform 0.2s;
+}
+
+
 
 .characterPhoto
 {
@@ -226,13 +236,24 @@ position:absolute;
 
 .addButton
 {
+border-color: transparent;
 border-radius: 0 0 30px 0;
-background-color:#b52222;
+background-color:#98A678;
 height:100px;
 width:100px;
-left:450px;
-top:550px;
+right:0px;
+bottom:0px;
 position:absolute;
+}
+
+.addButton:hover
+{
+    background-color: #af4e4e;
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .addIcon
@@ -242,8 +263,8 @@ width:103px;
 padding:0px;
 border-style:hidden;
 outline:none;
-left:0;
-top:0;
+left:-1px;
+top:-1px;
 position:absolute;
 }
 
@@ -1433,13 +1454,47 @@ position:absolute;
 
 .RequestLocationAddButton
 {
-background-color:#af4e4e;
+    background-color:#98A678;
+    height:91px;
+    width:554px;
+    border-radius:30px;
+    top:490px;
+    left:1100px;
+    position:absolute;
+    transition: background-color 10s;
+}
+
+.RequestLocationAddButton:hover
+{
+    background-color: #98A678;
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+
+
+.RequestLocationDeleteButton
+{
+background-color:#AF4E4E;
 height:91px;
 width:554px;
 border-radius:30px;
-top:490px;
+top:600px;
 left:1100px;
 position:absolute;
+}
+
+.RequestLocationDeleteButton:hover
+{
+    background-color: #AF4E4E;
+    color: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
 }
 
 .RequestLocationAddHeader
