@@ -1,6 +1,8 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from datetime import date
+
+from django.urls.base import reverse
 from .models import Character, Request, CharacterToRequest
 from django.db import connection
 
@@ -37,6 +39,7 @@ def characterDetails(request, id):
 
 def charactersOnMap(request, id):
     req = Request.objects.filter(request_id=id)
+
     characters_in_request = []
     coordinates = []
     if req:
@@ -58,8 +61,6 @@ def charactersOnMap(request, id):
 
 
 
-
-
 def add_character_to_request_for_user(user_id, character_id):
     request = get_active_request_for_user(user_id)
     CharacterToRequest.objects.get_or_create(request=request, character_id=character_id)
@@ -73,4 +74,4 @@ def add_character(request, character_id):
 def delete_request(request, request_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE request SET status = 'Удалён' WHERE request_id = %s", [request_id])
-    return Characters(request)
+    return HttpResponseRedirect(reverse('Characters'))

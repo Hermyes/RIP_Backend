@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    <div class="Background">
     <div class="UpperBar">
         <!-- <div class="AccountIcon">
             <img src="{% static 'image/AccountIcon.svg' %}" alt="Account Icon">
@@ -22,19 +23,14 @@
 
     
     
-    <div class="Background">
+    
         
-    </div>
     
-    
-    <div class="content">
-        {% block content %}
-        {% endblock %}
-    </div>
-    <!-- <div class="BottomMenu">
-        <div>
-            Асланова Анастасия
+        <div class="content">
+            
+            {% block content %}
+            {% endblock %}
         </div>
-    </div> -->
+    </div>
 </body>
 </html>

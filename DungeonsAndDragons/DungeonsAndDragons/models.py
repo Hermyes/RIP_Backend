@@ -5,19 +5,19 @@ class Character(models.Model):
     character_id = models.AutoField(primary_key=True)
     name = models.CharField(unique=True, max_length=20)
     race = models.CharField(max_length=20)
-    class_field = models.CharField(db_column='class', max_length=14)  # Field renamed because it was a Python reserved word.
+    class_field = models.CharField(db_column='class', max_length=14)  
     description = models.CharField(max_length=1000)
     features = models.CharField(max_length=150)
     special_equipment = models.CharField(max_length=150)
     skills = models.CharField(max_length=100)
     hit_points = models.IntegerField()
     armor_class = models.IntegerField()
-    strength = models.CharField(max_length=6)
-    dexterity = models.CharField(max_length=6)
-    constitution = models.CharField(max_length=6)
-    intelligence = models.CharField(max_length=6)
-    wisdom = models.CharField(max_length=6)
-    charisma = models.CharField(max_length=6)
+    strength = models.CharField(max_length=7)
+    dexterity = models.CharField(max_length=7)
+    constitution = models.CharField(max_length=7)
+    intelligence = models.CharField(max_length=7)
+    wisdom = models.CharField(max_length=7)
+    charisma = models.CharField(max_length=7)
     photo_url = models.CharField(unique=True, max_length=100)
 
     class Meta:
@@ -36,6 +36,7 @@ class CharacterToRequest(models.Model):
     class Meta:
         managed = False
         db_table = 'character_to_request'
+        unique_together = (('character_id', 'request_id'),)
 
 
 class Request(models.Model):

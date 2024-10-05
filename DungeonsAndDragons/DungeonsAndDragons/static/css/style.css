@@ -41,18 +41,19 @@ z-index: 1000;
 
 .Background               /*  Скопировано */
 {
-    background-repeat: repeat;
     background-image: url("http://localhost:9000/dungeonsanddragonsphotos/bgdark.png");
     background-size: cover;
     background-repeat: repeat;
     background-position: center;
-    top: 120px;
-background-color:#2A2928;
-height:100%;
-width:100%;
-padding:0px;
-position:absolute;
+    top: 0;
+    background-color: #2A2928;
+    height: 2000px;
+    width: 100%;
+    padding: 0px;
+    position: absolute;
+    z-index: -1;
 }
+
 
 /* .AccountIcon
 {
@@ -199,9 +200,10 @@ position:absolute;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 40px;
-    top:348px;
-    left:54px;
-    position:absolute;
+    top: 348px;
+    left: 54px;
+    position: absolute;
+    max-width: calc(3 * 550px + 2 * 40px);
 }
 
 .characterCard            /*  Скопировано */
