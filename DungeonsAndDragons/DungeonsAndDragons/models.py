@@ -8,16 +8,8 @@ class Character(models.Model):
     class_field = models.CharField(db_column='class', max_length=14)  
     description = models.CharField(max_length=1000)
     features = models.CharField(max_length=150)
-    special_equipment = models.CharField(max_length=150)
-    skills = models.CharField(max_length=100)
     hit_points = models.IntegerField()
     armor_class = models.IntegerField()
-    strength = models.CharField(max_length=7)
-    dexterity = models.CharField(max_length=7)
-    constitution = models.CharField(max_length=7)
-    intelligence = models.CharField(max_length=7)
-    wisdom = models.CharField(max_length=7)
-    charisma = models.CharField(max_length=7)
     photo_url = models.CharField(unique=True, max_length=100)
 
     class Meta:

@@ -51,6 +51,7 @@ def charactersOnMap(request, id):
             char_with_coordinates = {
                 'id': char.character_id,
                 'name': char.name,
+                'race': char.race,
                 'photo_url': char.photo_url,
                 'coordinates': {'x': item.coordinate_x, 'y': item.coordinate_y},
             }

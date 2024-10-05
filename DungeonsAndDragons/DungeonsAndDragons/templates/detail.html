@@ -9,7 +9,7 @@
         <hr class="DetailPhotoCardLine">
         <h2 class="DetailPhotoCardCharacterName">{{ character.name }}</h2>
 </div>
-<div class="DetailCharacterParameters">
+<!-- <div class="DetailCharacterParameters">
     <h2 class="DetailCharacterParametersStrengthHeader">Сил</h2>
     <p class="DetailCharacterParametersStrengthValue">{{ character.strength }}</p>
     <h2 class="DetailCharacterParametersDexterityHeader">Лов</h2>
@@ -22,11 +22,11 @@
     <p class="DetailCharacterParametersWisdomValue">{{ character.wisdom }}</p>
     <h2 class="DetailCharacterParametersCharismaHeader">Хар</h2>
     <p class="DetailCharacterParametersCharismaValue">{{ character.charisma }}</p>
-</div>
+</div> -->
 <div class="DetailCharacterRaceAndClassCard">
     <h2 class="DetailCharacterRaceAndClassCardRaceAndClassHeader">Класс:
         Раса:</h2>
-    <p class="DetailCharacterRaceAndClassCardClassValue">{{ character.class}}</p>
+    <p class="DetailCharacterRaceAndClassCardClassValue">{{ character.class_field}}</p>
     <p class="DetailCharacterRaceAndClassCardRaceValue">{{ character.race }}</p>
 </div>
 <div class="DetailCharacterArmorClassCard">
@@ -48,10 +48,10 @@
         <p class="DetailCharacterDescription">{{ character.description }}</p>
     </div>
 
-    <p class="DetailCharacterSpecialEquipmentHeader">Особое сняряжение:</p>
-    <p class="DetailCharacterSpecialEquipmentValue">{{ character.special_equipment }}</p>
+    <!-- <p class="DetailCharacterSpecialEquipmentHeader">Особое сняряжение:</p>
+    <p class="DetailCharacterSpecialEquipmentValue">{{ character.special_equipment }}</p> -->
     
-    <p class="DetailCharacterSkillsHeader">Навыки:</p>
-    <p class="DetailCharacterSkillsValue">{{ character.skills }}</p>
+    <p class="DetailCharacterSkillsHeader">Особенности:</p>
+    <p class="DetailCharacterSkillsValue">{{ character.features }}</p>
 </div>
 {%endblock%}
