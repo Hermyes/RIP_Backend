@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from datetime import date
 
 from django.urls.base import reverse
@@ -68,10 +68,10 @@ def add_character_to_request_for_user(user_id, character_id):
 
 def add_character(request, character_id):
     add_character_to_request_for_user(user_id, character_id)
-    return Characters(request)
+    return redirect('Characters')
 
 
 def delete_request(request, request_id):
     with connection.cursor() as cursor:
         cursor.execute("UPDATE request SET status = 'Удалён' WHERE request_id = %s", [request_id])
-    return HttpResponseRedirect(reverse('Characters'))
+    return redirect('Characters')
