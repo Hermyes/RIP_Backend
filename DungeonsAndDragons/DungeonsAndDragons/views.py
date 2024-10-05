@@ -11,7 +11,7 @@ user_id=1
 def get_active_request_for_user(user_id):
     request = Request.objects.filter(creator_id=user_id, status='draft').first()
     if request is None:
-        request = Request.objects.create(creator_id=user_id, status='draft')
+        request = Request.objects.create(creator_id=user_id, status='draft', creation_date=date.today())
     return request
 
 def count_characters(request_id):
