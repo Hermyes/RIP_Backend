@@ -38,7 +38,9 @@ def characterDetails(request, id):
     return render(request, 'detail.html', {'character': character})
 
 def charactersOnMap(request, id):
-    req = Request.objects.filter(request_id=id)
+    req = Request.objects.get(request_id=id)
+    if req.status == 'Удалён':
+        return HttpResponse(status=404)
 
     characters_in_request = []
     coordinates = []
@@ -54,7 +56,7 @@ def charactersOnMap(request, id):
             }
             characters_in_request.append(char_with_coordinates)
             coordinates.append({'coordinate_x': item.coordinate_x, 'coordinate_y': item.coordinate_y})
-        map_name = req.first().map_name
+        map_name = req.map_name
     else:
         map_name = ""
     return render(request, 'request.html', {'characters': characters_in_request, 'map_name': map_name, 'coordinates': coordinates, 'current_request_id': id})
