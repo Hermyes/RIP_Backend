@@ -85,7 +85,7 @@ class CharacterDetail(APIView):
         draft = user1.request_creator.filter(status='draft').first()
         character = get_object_or_404(self.model_class, character_id=character_id)
         if not draft and not(CharacterToRequest.objects.filter(request_id = draft, character_id = character.character_id).exists()):
-            draft = Request(userID = user1)
+            draft = Request(creator = user1, creation_date = timezone.now())
             draft.save()
         if not(CharacterToRequest.objects.filter(request_id = draft.request_id, character_id = character.character_id).exists()):
             new_position = CharacterToRequest(request_id = draft.request_id, character_id = character.character_id)
