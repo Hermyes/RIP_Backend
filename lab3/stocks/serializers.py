@@ -3,6 +3,9 @@ from rest_framework import serializers
 
 
 class RequestSerializer(serializers.ModelSerializer):
+    creator = serializers.StringRelatedField()
+    moderator = serializers.StringRelatedField()
+    
     class Meta:
         model = Request
         fields = [
