@@ -1,25 +1,49 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager, BaseUserManager
+from django.contrib.auth.models import Group, Permission
 
 
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.BooleanField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.BooleanField()
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
+class NewUserManager(UserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('User must have an email address')
 
-    def __str__(self):
-        return f'{self.username}'
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self.db)
+        return user
 
-    class Meta:
-        managed = False
-        db_table = 'auth_user'
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField("email адрес", unique=True, max_length=254)
+    password = models.CharField(max_length=100, verbose_name="Пароль")
+    is_staff = models.BooleanField(default=False, verbose_name="Является ли пользователь менеджером?")
+    is_superuser = models.BooleanField(default=False, verbose_name="Является ли пользователь админом?")
+
+    USERNAME_FIELD = 'email'
+
+    objects = NewUserManager()
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customuser_groups',  # Unique related_name to avoid clashes
+        blank=True,
+        verbose_name='Группы'
+    )
+
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customuser_permissions',  # Unique related_name to avoid clashes
+        blank=True,
+        verbose_name='Разрешения'
+    )
+
 
 class Character(models.Model):
     character_id = models.AutoField(primary_key=True)
@@ -65,8 +89,8 @@ class Request(models.Model):
     formation_date = models.DateTimeField(blank=True, null=True)
     completion_date = models.DateTimeField(blank=True, null=True)
     map_name = models.CharField(max_length=20)
-    creator = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='request_creator', blank=True, null=True)
-    moderator = models.ForeignKey(AuthUser, models.DO_NOTHING, related_name='request_moderator', blank=True, null=True)
+    creator = models.ForeignKey(CustomUser, models.DO_NOTHING, related_name='request_creator', blank=True, null=True)
+    moderator = models.ForeignKey(CustomUser, models.DO_NOTHING, related_name='request_moderator', blank=True, null=True)
 
 
     class Meta:
