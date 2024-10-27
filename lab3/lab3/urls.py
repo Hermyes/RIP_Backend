@@ -29,12 +29,12 @@ urlpatterns = [
     path(r'characters/', views.CharacterList.as_view(), name='characters-list'),
     path(r'characters/<int:character_id>/', views.CharacterDetail.as_view(), name='character-detail'),
     # path(r'characters/<int:character_id>/put/', views.put, name='characters-put'),
-    path('api/characters/<int:character_id>/addImage', views.add_image, name='add-character-image'),
+    path('api/characters/<int:character_id>/addImage', views.AddImageView.as_view(), name='add-character-image'),
 
     path('requests/', views.RequestList.as_view(), name='requests-list'),
     path('requests/<int:request_id>', views.RequestDetail.as_view(), name='request-detail'),
-    path('requests/<int:request_id>/form', views.saveRequestByCreator, name='request-form'),
-    path('requests/<int:request_id>/moderate', views.completeOrReject, name='request-moderate'),
+    path('requests/<int:request_id>/form', views.SaveRequestByCreatorView.as_view(), name='request-form'),
+    path('requests/<int:request_id>/moderate', views.CompleteOrRejectView.as_view(), name='request-moderate'),
 
 
     path('characterOnMap/<int:request_id>/<int:character_id>', views.CharacterToRequestMethod.as_view(), name='character-on-map'),

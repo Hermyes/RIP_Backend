@@ -31,10 +31,10 @@ REDIS_PORT = 6379
 session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 
-
 def method_permission_classes(classes):
     def decorator(func):
         def decorated_func(self, *args, **kwargs):
+            # Устанавливаем классы разрешений
             self.permission_classes = classes
             user = getUserBySession(self.request)
             if user == AnonymousUser():
@@ -42,11 +42,15 @@ def method_permission_classes(classes):
             else:
                 try:
                     self.check_permissions(self.request)
-                except Exception as e:
+                except Exception:
                     return Response({"detail": "You do not have permission to perform this action."}, status=403)
             return func(self, *args, **kwargs)
         return decorated_func
     return decorator
+
+
+
+
 
 class userProfile(APIView):
     model = get_user_model()
@@ -247,24 +251,23 @@ class CharacterDetail(APIView):
         return Response(status=status.HTTP_208_ALREADY_REPORTED)
 
 
-@method_permission_classes((IsAdmin,))
-@swagger_auto_schema(
-    method='post',
-    operation_description="Добавить изображение к персонажу",
-    responses={
-        200: openapi.Response(description="Изображение успешно добавлено"),
-        404: openapi.Response(description="Персонаж не найден"),
-        400: openapi.Response(description="Ошибка при добавлении изображения")
-    }
-)
-@api_view(['Post'])
-def add_image(request, character_id, format = None):
-    character = get_object_or_404(Character, character_id=character_id)
-    pic = request.FILES.get('pic')
-    result = add_pic(character, pic)
-    if 'error' in result.data:
-        return result
-    return Response(status=status.HTTP_200_OK)
+class AddImageView(APIView):
+    @method_permission_classes(IsAdmin,)
+    @swagger_auto_schema(
+        operation_description="Добавить изображение к персонажу",
+        responses={
+            200: openapi.Response(description="Изображение успешно добавлено"),
+            404: openapi.Response(description="Персонаж не найден"),
+            400: openapi.Response(description="Ошибка при добавлении изображения")
+        }
+    )
+    def post(self, request, character_id, format=None):
+        character = get_object_or_404(Character, character_id=character_id)
+        pic = request.FILES.get('pic')
+        result = add_pic(character, pic)
+        if 'error' in result.data:
+            return result
+        return Response(status=status.HTTP_200_OK)
 
 
 
@@ -346,81 +349,84 @@ class RequestDetail(APIView):
         return Response(self.serializer_class(req).data)
     
 
-@swagger_auto_schema(
-    method='put',
-    operation_description="Сохранить заявку создателем",
-    request_body=requestDetailSerializer,
-    responses={
-        200: requestDetailSerializer(),
-        400: openapi.Response(description="Неверные данные"),
-        404: openapi.Response(description="Заявка не найдена")
-    }
-)
-@api_view(['Put'])    
-def saveRequestByCreator(request, request_id, format=None):
-    req = get_object_or_404(Request, request_id=request_id)
-    required_fields = ['map_name']
-    serializer = requestDetailSerializer(req, data=request.data, partial=True)
-    if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class SaveRequestByCreatorView(APIView):
+    @swagger_auto_schema(
+        operation_description="Сохранить заявку создателем",
+        request_body=requestDetailSerializer,
+        responses={
+            200: requestDetailSerializer(),
+            400: openapi.Response(description="Неверные данные"),
+            404: openapi.Response(description="Заявка не найдена")
+        }
+    )
+    def put(self, request, request_id, format=None):
+        req = get_object_or_404(Request, request_id=request_id)
+        required_fields = ['map_name']
+        serializer = requestDetailSerializer(req, data=request.data, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    missing_fields = [field for field in required_fields if field not in request.data or not request.data[field]]
+        missing_fields = [field for field in required_fields if field not in request.data or not request.data[field]]
+            
+        if missing_fields:
+            return Response({'error': f'Пропущенные обязательные поля: {", ".join(missing_fields)}'}, status=status.HTTP_400_BAD_REQUEST)
         
-    if missing_fields:
-        return Response({'error': f'Пропущенные обязательные поля: {", ".join(missing_fields)}'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    req.formation_date = timezone.now()
-    req.status = 'Сформирован'
-    req.save()
-    serializer.save()
-    return Response(serializer.data)
+        req.formation_date = timezone.now()
+        req.status = 'Сформирован'
+        req.save()
+        serializer.save()
+        return Response(serializer.data)
     
 
-@method_permission_classes((IsManager,))
-@swagger_auto_schema(
-    method='put',
-    operation_description="Завершить или отклонить заявку",
-    request_body=requestDetailSerializer,
-    responses={
-        200: requestDetailSerializer(),
-        400: openapi.Response(description="Неправильное состояние или координаты персонажей совпадают"),
-        403: openapi.Response(description="У вас нет разрешения на выполнение этого действия"),
-        404: openapi.Response(description="Заявка не найдена")
-    }
-)
-@api_view(['PUT'])
-def completeOrReject(request, request_id):
-    try:
-        req = Request.objects.get(request_id=request_id)
-    except Request.DoesNotExist:
-        return Response({'error': 'Заявка не найдена'}, status=status.HTTP_404_NOT_FOUND)
+class CompleteOrRejectView(APIView):
 
-    moderator = request.data.get('moderator')
-    action = request.data.get('status') 
-    
-    if action not in ['Завершён', 'Отклонён']:
-        return Response({'error': 'Неправильное состояние'}, status=status.HTTP_400_BAD_REQUEST)
-    
+    @method_permission_classes((IsManager,))
+    @swagger_auto_schema(
+        operation_description="Завершить или отклонить заявку",
+        request_body=requestDetailSerializer,
+        responses={
+            200: requestDetailSerializer(),
+            400: openapi.Response(description="Неправильное состояние или координаты персонажей совпадают"),
+            403: openapi.Response(description="У вас нет разрешения на выполнение этого действия"),
+            404: openapi.Response(description="Заявка не найдена")
+        }
+    )
+    def put(self, request, request_id):
+        try:
+            req = Request.objects.get(request_id=request_id)
+        except Request.DoesNotExist:
+            return Response({'error': 'Заявка не найдена'}, status=status.HTTP_404_NOT_FOUND)
 
-    if action == 'Завершён':
-        req.moderator = moderator
-        req.completion_date = timezone.now()
+        # Accessing request.data correctly
+        moderator = request.data.get('moderator')
+        action = request.data.get('status')
         
-        characters = CharacterToRequest.objects.filter(request=req)
-        coordinates = [(char.coordinate_x, char.coordinate_y) for char in characters]
+        if action not in ['Завершён', 'Отклонён']:
+            return Response({'error': 'Неправильное состояние'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if action == 'Завершён':
+            req.moderator = moderator
+            req.completion_date = timezone.now()
+            
+            # Validate character coordinates
+            characters = CharacterToRequest.objects.filter(request=req)
+            coordinates = [(char.coordinate_x, char.coordinate_y) for char in characters]
 
-        if len(coordinates) != len(set(coordinates)):
-            return Response({'error': 'Координаты персонажей совпадают'}, status=status.HTTP_400_BAD_REQUEST)
-        req.status = 'Завершён'
-    
-    elif action == 'Отклонён':
-        req.moderator = moderator
-        req.completion_date = timezone.now()
-        req.status = 'Отклонён'
-    req.save()
-    
-    serializer = RequestSerializer(req)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+            if len(coordinates) != len(set(coordinates)):
+                return Response({'error': 'Координаты персонажей совпадают'}, status=status.HTTP_400_BAD_REQUEST)
+            req.status = 'Завершён'
+        
+        elif action == 'Отклонён':
+            req.moderator = moderator
+            req.completion_date = timezone.now()
+            req.status = 'Отклонён'
+        
+        req.save()
+        
+        # Serialize the response data
+        serializer = RequestSerializer(req)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class CharacterToRequestMethod(APIView):
