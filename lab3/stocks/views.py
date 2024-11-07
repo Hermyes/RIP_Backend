@@ -21,6 +21,7 @@ from stocks.permissions import IsManager, IsAdmin, IsAuth
 from django.views.decorators.csrf import csrf_exempt
 import redis
 import uuid
+import random
 from django.contrib.auth.models import AnonymousUser
 from .getUser import getUserBySession
 
@@ -58,14 +59,14 @@ class userProfile(APIView):
 
     @swagger_auto_schema(request_body=serializer_class)
     @method_permission_classes((IsAdmin,))
-    def put(self, request, pk, format = None):
+    def put(self, request, pk):
         user1 = get_object_or_404(self.model, pk = pk)
         serialized = self.serializer_class(user1, data=request.data, partial = True)
         if serialized.is_valid():
-            serialized.save()
             if 'password' in serialized.validated_data:
                 user1.set_password(serialized.validated_data.get('password'))
                 user1.save()
+            serialized.save()
             return Response(serialized.data, status=status.HTTP_202_ACCEPTED)
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -105,7 +106,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({'status': 'Error', 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 # Логин
-@csrf_exempt
 @permission_classes([AllowAny])
 @authentication_classes([])
 @swagger_auto_schema(
@@ -397,9 +397,12 @@ class CompleteOrRejectView(APIView):
         except Request.DoesNotExist:
             return Response({'error': 'Заявка не найдена'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Accessing request.data correctly
+        print(f"Initial status in DB: {req.status}")
+
         moderator = request.data.get('moderator')
         action = request.data.get('status')
+
+        print(f"Received status: {action}")
         
         if action not in ['Завершён', 'Отклонён']:
             return Response({'error': 'Неправильное состояние'}, status=status.HTTP_400_BAD_REQUEST)
@@ -407,8 +410,7 @@ class CompleteOrRejectView(APIView):
         if action == 'Завершён':
             req.moderator = moderator
             req.completion_date = timezone.now()
-            
-            # Validate character coordinates
+            req.rating = random.randint(1, 100)
             characters = CharacterToRequest.objects.filter(request=req)
             coordinates = [(char.coordinate_x, char.coordinate_y) for char in characters]
 
@@ -423,7 +425,6 @@ class CompleteOrRejectView(APIView):
         
         req.save()
         
-        # Serialize the response data
         serializer = RequestSerializer(req)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

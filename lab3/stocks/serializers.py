@@ -27,7 +27,7 @@ class RequestSerializer(serializers.ModelSerializer):
         model = Request
         fields = [
             "request_id", "status", "creation_date", "formation_date",
-            "completion_date", "map_name", "creator", "moderator"
+            "completion_date", "map_name", "creator", "moderator", "rating"
         ]
 
     def get_fields(self):
@@ -91,7 +91,7 @@ class requestDetailSerializer(serializers.ModelSerializer):
         model = Request
         fields = [
             "request_id", "status", "creation_date", "formation_date",
-            "completion_date", "map_name", "creator", "moderator", "characters"
+            "completion_date", "map_name", "creator", "moderator", "characters", "rating"
         ]
     
     def get_fields(self):

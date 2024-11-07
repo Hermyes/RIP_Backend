@@ -89,6 +89,7 @@ class Request(models.Model):
     formation_date = models.DateTimeField(blank=True, null=True)
     completion_date = models.DateTimeField(blank=True, null=True)
     map_name = models.CharField(max_length=20)
+    rating = models.IntegerField(blank=True, null=True)
     creator = models.ForeignKey(CustomUser, models.DO_NOTHING, related_name='request_creator', blank=True, null=True)
     moderator = models.ForeignKey(CustomUser, models.DO_NOTHING, related_name='request_moderator', blank=True, null=True)
 
