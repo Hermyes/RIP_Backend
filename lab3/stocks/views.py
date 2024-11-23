@@ -151,19 +151,25 @@ class CharacterList(APIView):
         searchText = request.query_params.get('CharacterName', '')
         searchResult = Character.objects.filter(name__icontains=searchText)
         user1 = getUserBySession(self.request)
+        
         if user1 != AnonymousUser():
             draftReq = user1.request_creator.filter(status='draft').first()
             if draftReq:
-                CharacterOnMapCount = CharacterToRequest.objects.filter(request_id = draftReq).count()
+                CharacterOnMapCount = CharacterToRequest.objects.filter(request_id=draftReq).count()
                 CharacterOnMapID = draftReq.request_id
             else:
                 CharacterOnMapCount = 0
                 CharacterOnMapID = ''
         else:
-            wishCount = 0
-            wishID = ''
-        serial_data = self.serializer_class(searchResult, many = True)
-        return Response({'characters': serial_data.data, 'CharacterOnMapID': CharacterOnMapID, 'CharacterOnMapCount': CharacterOnMapCount})
+            CharacterOnMapCount = 0
+            CharacterOnMapID = ''
+        
+        serial_data = self.serializer_class(searchResult, many=True)
+        return Response({
+            'characters': serial_data.data,
+            'CharacterOnMapID': CharacterOnMapID,
+            'CharacterOnMapCount': CharacterOnMapCount
+        })
 
     
     @swagger_auto_schema(
