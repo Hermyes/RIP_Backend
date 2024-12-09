@@ -56,18 +56,27 @@ def method_permission_classes(classes):
 class userProfile(APIView):
     model = get_user_model()
     serializer_class = UserSerializer
-
-    @swagger_auto_schema(request_body=serializer_class)
-    @method_permission_classes((IsAdmin,))
-    def put(self, request, pk):
+    # Редактирование профиля
+    @swagger_auto_schema(request_body=serializer_class,
+                         operation_description='Редактирование профиля',)
+    @method_permission_classes((IsAuth,))
+    def put(self, request, pk, format = None): 
         user1 = get_object_or_404(self.model, pk = pk)
         serialized = self.serializer_class(user1, data=request.data, partial = True)
         if serialized.is_valid():
+            serialized.save()
             if 'password' in serialized.validated_data:
                 user1.set_password(serialized.validated_data.get('password'))
                 user1.save()
-            serialized.save()
-            return Response(serialized.data, status=status.HTTP_202_ACCEPTED)
+            if 'email' in serialized.validated_data:
+                old_ssid = request.COOKIES.get('session_id')
+                session_storage.delete(old_ssid)
+                random_key = str(uuid.uuid4())
+                session_storage.set(random_key, serialized._validated_data.get('email'))
+                response = Response(serialized.data, status=status.HTTP_202_ACCEPTED)
+                response.set_cookie("session_id", random_key)
+
+            return response
         return Response(serialized.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -106,12 +115,18 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({'status': 'Error', 'error': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 # Логин
-@permission_classes([AllowAny])
-@authentication_classes([])
 @swagger_auto_schema(
     method='post',
-    request_body=UserSerializer
+    request_body=UserSerializer,
+    responses={
+        200: openapi.Response(description="Успешный вход",
+                              schema=UserSerializer),
+        400: openapi.Response(description="Неверные данные"),
+        401: openapi.Response(description="Ошибка аутентификации")
+    }
 )
+@permission_classes([AllowAny])
+@authentication_classes([])
 @api_view(['POST'])
 def login_view(request):
     email = request.data["email"] 
@@ -121,23 +136,31 @@ def login_view(request):
         random_key = str(uuid.uuid4())
         session_storage.set(random_key, email)
 
-        response = HttpResponse("{'status': 'ok'}")
+        old_ssid = request.COOKIES.get('session_id', '')
+        if old_ssid:
+            if session_storage.get(old_ssid):
+                session_storage.delete(old_ssid)
+
+        serialised = UserSerializer(user)
+        response = Response(serialised.data, status=status.HTTP_200_OK)
         response.set_cookie("session_id", random_key)
+
+        
 
         return response
     else:
-        return HttpResponse("{'status': 'error', 'error': 'login failed'}")
+        return Response({'status': 'error', 'error': 'login failed'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-@csrf_exempt
-@permission_classes([IsAuth])
-@authentication_classes([])
-@api_view(['POST'])
-def logout_view(request):
-    logout(request)
-    response = HttpResponse("{'status': 'ok'}")
-    response.delete_cookie("session_id")
-    return response
+class userLogout(APIView):
+    model = get_user_model()
+    serializer_class = UserSerializer
+
+    @method_permission_classes((IsAuth,))
+    def post(self, request, format = None): #деваторизация
+        ssid = request.COOKIES.get('session_id')
+        session_storage.delete(ssid)
+        return Response({'status': 'logged out'}, status=status.HTTP_200_OK)
 
 class CharacterList(APIView):
     model_class = Character
@@ -145,7 +168,8 @@ class CharacterList(APIView):
 
     @swagger_auto_schema(
         operation_description="Получить список всех персонажей",
-        responses={200: CharacterSerializer(many=True)}
+        responses={200: CharactersSerializer},
+        query_serializer=CharacterNameSerializer,
     )
     def get(self, request, format=None):
         searchText = request.query_params.get('CharacterName', '')
@@ -175,6 +199,7 @@ class CharacterList(APIView):
     @swagger_auto_schema(
         operation_description="Создать нового персонажа",
         request_body=CharacterSerializer,
+        operation_id="addCharacter",
         responses={
             201: CharacterSerializer(),
             400: openapi.Response(description="Неверные данные")
@@ -236,24 +261,36 @@ class CharacterDetail(APIView):
         character.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-
-    @method_permission_classes((IsAuth,))
     @swagger_auto_schema(
-            operation_description="Добавить персонажа в заявку",
-            request_body=CharacterSerializer,
-            responses={200: CharacterSerializer()}
-            )
+        operation_description="Добавить персонажа в заявку",
+        # request_body=CharacterSerializer,
+        operation_id="addCharacterToRequest",
+        responses={
+            200: openapi.Response(
+                description="Успешно добавлен",
+                schema=requestDetailSerializer(),
+            ),
+            208: openapi.Response(
+                description="Персонаж уже добавлен в заявку",
+                schema=requestDetailSerializer(),
+                ),
+                
+            404: openapi.Response(description="Персонаж не найден"),
+            400: openapi.Response(description="Неверные данные")
+        }
+    )
+    @method_permission_classes((IsAuth,))
     def post(self, request, character_id, format=None):
         user1 = getUserBySession(self.request)
         draft = user1.request_creator.filter(status='draft').first()
         character = get_object_or_404(self.model_class, character_id=character_id)
-        if not draft and not(CharacterToRequest.objects.filter(request_id = draft, character_id = character.character_id).exists()):
-            draft = Request(creator = user1, creation_date = timezone.now())
+        if not draft and not(CharacterToRequest.objects.filter(request_id=draft, character_id=character.character_id).exists()):
+            draft = Request(creator=user1, creation_date=timezone.now())
             draft.save()
-        if not(CharacterToRequest.objects.filter(request_id = draft.request_id, character_id = character.character_id).exists()):
-            new_position = CharacterToRequest(request_id = draft.request_id, character_id = character.character_id)
+        if not(CharacterToRequest.objects.filter(request_id=draft.request_id, character_id=character.character_id).exists()):
+            new_position = CharacterToRequest(request_id=draft.request_id, character_id=character.character_id)
             new_position.save()
-            return Response(status=status.HTTP_200_OK)
+            return Response(requestDetailSerializer(draft).data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_208_ALREADY_REPORTED)
 
 
@@ -282,11 +319,13 @@ class RequestList(APIView):
     serializer_class = RequestSerializer
 
 
-    @method_permission_classes((IsAuth,))
+    
     @swagger_auto_schema(
         operation_description="Получить список всех заявок",
+        operation_id='getRequests',
         responses={200: RequestSerializer(many=True)}
     )
+    @method_permission_classes((IsAuth,))
     def get(self, request, format=None):
         user = getUserBySession(request)
         start_date = request.query_params.get('start_date')
@@ -314,7 +353,7 @@ class RequestDetail(APIView):
     serializer_class = requestDetailSerializer
 
 
-
+    
     @swagger_auto_schema(
         operation_description="Получить детали заявки",
         responses={200: requestDetailSerializer()}
@@ -367,16 +406,27 @@ class SaveRequestByCreatorView(APIView):
     )
     def put(self, request, request_id, format=None):
         req = get_object_or_404(Request, request_id=request_id)
-        required_fields = ['map_name']
         serializer = requestDetailSerializer(req, data=request.data, partial=True)
+        
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        missing_fields = [field for field in required_fields if field not in request.data or not request.data[field]]
-            
-        if missing_fields:
-            return Response({'error': f'Пропущенные обязательные поля: {", ".join(missing_fields)}'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Проверяем, что в массиве characters у каждого объекта есть необходимые поля
+        characters_data = request.data.get('characters', [])
+        missing_fields_in_characters = []
+
+        for idx, character in enumerate(characters_data):
+            for field in ['coordinate_x', 'coordinate_y', 'friendorenemy']:
+                if not character.get(field):  # Проверка наличия значения
+                    missing_fields_in_characters.append(f"character[{idx}].{field}")
+        
+        if missing_fields_in_characters:
+            return Response(
+                {'error': f'Пропущенные обязательные поля: {", ".join(missing_fields_in_characters)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Обновляем заявку
         req.formation_date = timezone.now()
         req.status = 'Сформирован'
         req.save()
@@ -444,7 +494,8 @@ class CharacterToRequestMethod(APIView):
     @swagger_auto_schema(
         operation_description="Удалить персонажа из заявки",
         responses={
-            204: openapi.Response(description="Персонаж успешно удален из заявки"),
+            200: openapi.Response(description="Персонаж успешно удален из заявки",
+                                  schema=serializer_class(many=True)),
             404: openapi.Response(description="Персонаж или заявка не найдены")
         }
     )
@@ -467,7 +518,7 @@ class CharacterToRequestMethod(APIView):
     @method_permission_classes((IsAuth,))
     def put(self, request, character_id, request_id, format = None):
         character = get_object_or_404(self.model, character_id = character_id, request_id = request_id)
-        serializer = self.serializer_class(character, data=request.data)
+        serializer = self.serializer_class(character, data=request.data,  partial=True)
         if serializer.is_valid():
             serializer.save()
             characters = self.model.objects.filter(request_id = request_id)

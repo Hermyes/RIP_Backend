@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
     is_superuser = serializers.BooleanField(default=False, required=False)
     class Meta:
         model = CustomUser
-        fields = ['email', 'password', 'is_staff', 'is_superuser']
+        fields = '__all__'
 
 
     def get_fields(self):
@@ -38,7 +38,8 @@ class RequestSerializer(serializers.ModelSerializer):
             return new_fields 
 
 
-
+class CharacterNameSerializer(serializers.Serializer):
+          CharacterName = serializers.CharField()
 
 
 class CharacterSerializer(serializers.ModelSerializer):
@@ -57,6 +58,12 @@ class CharacterSerializer(serializers.ModelSerializer):
                 field.required = False
                 new_fields[name] = field
             return new_fields 
+
+
+class CharactersSerializer(serializers.Serializer):
+     characters = CharacterSerializer(many=True)
+     CharacterOnMapID = serializers.CharField()
+     CharacterOnMapCount = serializers.IntegerField()
 
 class CharacterToRequestSerializer(serializers.ModelSerializer):
     character = serializers.SerializerMethodField()
@@ -100,3 +107,6 @@ class requestDetailSerializer(serializers.ModelSerializer):
                 field.required = False
                 new_fields[name] = field
             return new_fields 
+    
+# class addCharacterRequestSerializer(serializers.Serializer):
+#      character_id
